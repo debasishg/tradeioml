@@ -1,0 +1,4 @@
+(executable
+ (public_name tradeioml)
+ (name main)
+ (libraries model repository))

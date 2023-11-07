@@ -1,0 +1,3 @@
+(library
+ (name model)
+ (libraries base calendar unix str validator))
