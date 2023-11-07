@@ -21,14 +21,12 @@ module Instrument : Instrument_sig = struct
 
   module Ccy = struct
     type t = {
-      base: instrument_base;
       instrument_type: instrument_type;
     }
   end
 
   module Equity = struct
     type t = {
-      base: instrument_base;
       instrument_type: instrument_type;
       issue_date: CalendarLib.Calendar.t;
       unit_price: unit_price;
@@ -37,7 +35,6 @@ module Instrument : Instrument_sig = struct
 
   module FixedIncome = struct
     type t = {
-      base: instrument_base;
       instrument_type: instrument_type;
       issue_date: CalendarLib.Calendar.t;
       maturity_date: CalendarLib.Calendar.t option;
@@ -46,10 +43,15 @@ module Instrument : Instrument_sig = struct
     }
   end
 
-  type t = 
+  type custom = 
     | Ccy of Ccy.t
     | Equity of Equity.t
     | FixedIncome of FixedIncome.t
+
+  type t = {
+    base: instrument_base;
+    custom: custom;
+  }
 
   let build_instrument_base isin name lot_size = {
     isin;
@@ -70,52 +72,47 @@ module Instrument : Instrument_sig = struct
   let ccy ~isin ~name = 
     let valid = validate_base ~isin ~name ~lot_size: 1 in
     match valid with
-    | Ok base -> Ok (Ccy { base = base; instrument_type = CCY })
+    | Ok base -> Ok { base = base; custom = Ccy { instrument_type = CCY } }
     | Error e -> Error e 
 
 
   let equity ~isin ~name ~lot_size ~unit_price ~issue_date = 
     let valid = validate_base ~isin ~name ~lot_size in
     match valid with
-    | Ok base -> Ok (
-        Equity { 
-          base = base; 
+    | Ok base -> Ok {
+        base = base;
+        custom = Equity { 
           instrument_type = Equity; 
           issue_date = issue_date; 
           unit_price = unit_price 
         }
-      )
+      }
     | Error e -> Error e 
 
 
   let fixed_income ~isin ~name ~lot_size ~issue_date ~maturity_date ~coupon_rate ~coupon_frequency = 
     let valid = validate_base ~isin ~name ~lot_size in
     match valid with
-    | Ok base -> Ok (
-        FixedIncome { 
-          base = base; 
+    | Ok base -> Ok {
+        base = base;
+        custom = FixedIncome { 
           instrument_type = FixedIncome; 
           issue_date = issue_date; 
           maturity_date = maturity_date;
           coupon_rate = coupon_rate;
           coupon_frequency = coupon_frequency;
         }
-      )
+      }
     | Error e -> Error e 
 
-  let get_instrument_type = function
-    | Ccy _ -> CCY
-    | Equity _ -> Equity
-    | FixedIncome _ -> FixedIncome
+  let get_instrument_type instrument = 
+    match instrument.custom with
+    | Ccy ccy -> ccy.instrument_type
+    | Equity equity -> equity.instrument_type
+    | FixedIncome fixed_income -> fixed_income.instrument_type
 
-  let get_isin = function
-    | Ccy ccy -> ccy.base.isin
-    | Equity equity -> equity.base.isin
-    | FixedIncome fixed_income -> fixed_income.base.isin
+  let get_isin instrument = instrument.base.isin
 
-  let get_name = function
-    | Ccy ccy -> ccy.base.name
-    | Equity equity -> equity.base.name
-    | FixedIncome fixed_income -> fixed_income.base.name
+  let get_name instrument = instrument.base.name
 
 end
