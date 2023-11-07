@@ -2,8 +2,8 @@ open Base
 open Id
 
 (* ISIN code and validation *)
-module ISINCode = struct
-  include String_id
+module ISINCode : ID = struct
+  type t = string
 
   let validate = 
     let open Validator in
@@ -15,15 +15,19 @@ module ISINCode = struct
       (TradingValidator.string_is_isin "Invalid isin")
 
   let of_string x = validate x
+  let to_string x = x
+  let ( = ) = String.equal
 end
 
 (* instrument name and validation *)
-module Instrumentname = struct
-  include String_id
+module Instrumentname : ID = struct
+  type t = string
 
   let validate = 
     let open Validator in
     string_is_not_empty "Empty"
 
   let of_string x = validate x
+  let to_string x = x
+  let ( = ) = String.equal
 end

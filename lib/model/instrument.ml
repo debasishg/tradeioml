@@ -59,12 +59,16 @@ module Instrument : Instrument_sig = struct
     lot_size;
   }
 
+  let validate_lot_size =
+    let open Validator in
+    int_min 1 "Must be > 0"
+
   let validate_base ~isin ~name ~lot_size = 
     let open Validator in
     let valid = build build_instrument_base 
     |> keep isin
     |> keep name
-    |> keep lot_size in
+    |> validate lot_size validate_lot_size in
     match valid with
     | Ok base -> Ok base
     | Error e -> Error e
