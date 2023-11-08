@@ -13,18 +13,23 @@ module Instrument : Instrument_sig = struct
   (* lot size for the instrument *)
   type lot_size = int
 
+  (* the basic attributes of an instrument *)
   type instrument_base = {
     isin: ISINCode.t;
     name: Instrumentname.t;
     lot_size: lot_size;
   }
 
+  (* Attributes specific to instrument types *)
+
+  (* Currency *)
   module Ccy = struct
     type t = {
       instrument_type: instrument_type;
     }
   end
 
+  (* Equity - stocks *)
   module Equity = struct
     type t = {
       instrument_type: instrument_type;
@@ -33,6 +38,7 @@ module Instrument : Instrument_sig = struct
     }
   end
 
+  (* Fixed Income - bonds *)
   module FixedIncome = struct
     type t = {
       instrument_type: instrument_type;
@@ -63,6 +69,8 @@ module Instrument : Instrument_sig = struct
     let open Validator in
     int_min 1 "Must be > 0"
 
+  (* [isin] and [name] come validated via the newtypes *)
+  (* just need to validate [lot_size] *)
   let validate_base ~isin ~name ~lot_size = 
     let open Validator in
     let valid = build build_instrument_base 

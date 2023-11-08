@@ -5,8 +5,8 @@ open Id
 (* Use [of_string] constructor to construct a validated account no *)
 
 (* account number and validation *)
-module Accountno = struct
-  include String_id
+module Accountno : ID = struct
+  type t = string
 
   let validate = 
     let open Validator in
@@ -15,17 +15,21 @@ module Accountno = struct
       (string_has_min_length 3 "Too short")
 
   let of_string x = validate x
+  let to_string x = x
+  let ( = ) = String.equal
 
 end
 
 (* account name and validation *)
-module Accountname = struct
-  include String_id
+module Accountname : ID = struct
+  type t = string
 
   let validate = 
     let open Validator in
     string_is_not_empty "Empty"
 
   let of_string x = validate x
+  let to_string x = x
+  let ( = ) = String.equal
 
 end

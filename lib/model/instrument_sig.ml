@@ -3,7 +3,7 @@ open Validator
 open Common
 
 module type Instrument_sig = sig
-  (* abstract type *)
+  (* abstract types *)
   type t
 
   type unit_price
@@ -11,6 +11,9 @@ module type Instrument_sig = sig
   type lot_size
 
   (* smart constructor for creating currency *)
+  (* the arguments that you pass to the smart constructor are domain types and not strings *)
+  (* and these types are validated when you create them via [of_string]. Hence there is *)
+  (* no way you can pass an invalid representation of an isin or a name to the constructor *)
   val ccy: isin: ISINCode.t -> name: Instrumentname.t -> (t, string) validator_result
 
   (* smart constructor for creating equity *)
