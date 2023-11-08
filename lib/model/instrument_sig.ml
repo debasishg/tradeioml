@@ -27,6 +27,18 @@ module type Instrument_sig = sig
   val get_isin : t -> ISINCode.t
 
   val get_name : t -> Instrumentname.t
+
+  val get_unit_price : t -> unit_price option
+
+  val get_lot_size : t -> lot_size 
+
+  val get_issue_date : t -> CalendarLib.Calendar.t option
+
+  val get_maturity_date : t -> CalendarLib.Calendar.t option
+
+  val get_coupon_rate : t -> coupon_rate option
+
+  val get_coupon_frequency : t -> coupon_frequency option
   
 end
   

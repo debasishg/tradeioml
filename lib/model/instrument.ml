@@ -127,4 +127,36 @@ module Instrument : Instrument_sig = struct
 
   let get_name instrument = instrument.base.name
 
+  let get_unit_price instrument = 
+    match instrument.custom with
+    | Ccy _ -> None
+    | Equity equity -> Some equity.unit_price
+    | FixedIncome _ -> None
+
+  let get_lot_size instrument = instrument.base.lot_size
+
+  let get_issue_date instrument = 
+    match instrument.custom with
+    | Ccy _ -> None
+    | Equity equity -> Some equity.issue_date
+    | FixedIncome fixed_income -> Some fixed_income.issue_date
+
+  let get_maturity_date instrument = 
+    match instrument.custom with
+    | Ccy _ -> None
+    | Equity _ -> None
+    | FixedIncome fixed_income -> fixed_income.maturity_date
+
+  let get_coupon_rate instrument = 
+    match instrument.custom with
+    | Ccy _ -> None
+    | Equity _ -> None
+    | FixedIncome fixed_income -> Some fixed_income.coupon_rate
+
+  let get_coupon_frequency instrument = 
+    match instrument.custom with
+    | Ccy _ -> None
+    | Equity _ -> None
+    | FixedIncome fixed_income -> Some fixed_income.coupon_frequency
+
 end
