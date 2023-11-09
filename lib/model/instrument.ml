@@ -4,8 +4,6 @@ open Instrument_sig
 open Common
 
 module Instrument : Instrument_sig = struct
-  (* unit price for the instrument *)
-  type unit_price = float
 
   (* coupon rate for fixed income *)
   type coupon_rate = float
@@ -43,10 +41,6 @@ module Instrument : Instrument_sig = struct
     type t = {
       instrument_type: instrument_type;
       issue_maturity_date: CalendarLib.Calendar.t * CalendarLib.Calendar.t option;
-      (*
-      issue_date: CalendarLib.Calendar.t;
-      maturity_date: CalendarLib.Calendar.t option;
-      *)
       coupon_rate: coupon_rate;
       coupon_frequency: coupon_frequency;
     }
@@ -167,6 +161,13 @@ module Instrument : Instrument_sig = struct
     | Ccy _ -> None
     | Equity equity -> Some (equity.issue_date, None)
     | FixedIncome fixed_income -> Some fixed_income.issue_maturity_date
+
+  let get_issue_date instrument = 
+    match instrument.custom with
+    | Ccy _ -> None
+    | Equity equity -> Some equity.issue_date
+    | FixedIncome fixed_income -> match fixed_income.issue_maturity_date with
+      | (issue_date, _) -> Some issue_date
 
   let get_coupon_rate instrument = 
     match instrument.custom with

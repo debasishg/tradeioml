@@ -6,7 +6,6 @@ module type Instrument_sig = sig
   (* abstract types *)
   type t
 
-  type unit_price
   type coupon_rate
   type lot_size
 
@@ -33,6 +32,8 @@ module type Instrument_sig = sig
   val get_lot_size : t -> lot_size 
 
   val get_issue_maturity_date : t -> (CalendarLib.Calendar.t * CalendarLib.Calendar.t option) option
+
+  val get_issue_date : t -> CalendarLib.Calendar.t option
 
   val get_coupon_rate : t -> coupon_rate option
 

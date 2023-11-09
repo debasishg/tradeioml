@@ -17,3 +17,15 @@ type instrument_type =
 type coupon_frequency = 
   | Annual 
   | SemiAnnual 
+
+(* buy/sell *)
+type buy_sell = 
+  | Buy 
+  | Sell 
+
+(* unit price for the instrument *)
+type quantity = float
+
+(* unit price for the instrument *)
+type unit_price = float
+
