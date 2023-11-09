@@ -4,7 +4,7 @@ module TradingValidator = struct
   include Validator
   
   type ('input, 'output) check = 'input -> 'output option
-  
+
   let custom
     (check : ('i, 'o) check)
     (error : 'e)
@@ -31,4 +31,26 @@ module TradingValidator = struct
   let date_in_future :
     (Calendar.t, Calendar.t, 'err) validator_builder =
       fun err -> custom date_in_future_check err
+
+  let date_precedes_check (date1: Calendar.t) (date2: Calendar.t option) = 
+    match date2 with
+    | None -> Some(date1)
+    | Some date2 ->
+    if date1 <= date2 then Some(date1) else None
+
+  let date_precedes :
+    Calendar.t option-> (Calendar.t, Calendar.t, 'err) validator_builder =
+      fun d1 err d2 -> 
+        custom (date_precedes_check d2) err d1
+
+  let date_order_check (dates: (Calendar.t * Calendar.t option)) =
+    match dates with
+    | (d1, None) -> Some(d1)
+    | (d1, Some d2) ->
+      if d1 <= d2 then Some(d1) else None
+
+  let date_order :
+    (Calendar.t * Calendar.t option, Calendar.t, 'err) validator_builder =
+      fun err dates -> 
+        custom date_order_check err dates
 end

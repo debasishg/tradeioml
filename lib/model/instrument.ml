@@ -81,12 +81,35 @@ module Instrument : Instrument_sig = struct
     | Ok base -> Ok base
     | Error e -> Error e
 
+  let validate_issue_maturity_date =
+    let open Tvalidator in
+    TradingValidator.date_order "Issue date must be before maturity date"
+
+  let build_fixed_income (instrument_type: instrument_type) (issue_date: CalendarLib.Calendar.t) (maturity_date: CalendarLib.Calendar.t option) (coupon_rate: coupon_rate) (coupon_frequency: coupon_frequency) = FixedIncome {
+    instrument_type; 
+    issue_date; 
+    maturity_date;
+    coupon_rate;
+    coupon_frequency;
+  }
+
+  let validate_fixed_income (instrument_type: instrument_type) (issue_date: CalendarLib.Calendar.t) (maturity_date: CalendarLib.Calendar.t option) (coupon_rate: coupon_rate) (coupon_frequency: coupon_frequency) =
+    let open Validator in
+    let valid = build build_fixed_income
+    |> keep instrument_type
+    |> keep issue_date
+    |> keep maturity_date
+    |> keep coupon_rate
+    |> keep coupon_frequency in
+    match valid with
+    | Ok _ -> Ok ()
+    | Error e -> Error e
+
   let ccy ~isin ~name = 
     let valid = validate_base ~isin ~name ~lot_size: 1 in
     match valid with
     | Ok base -> Ok { base = base; custom = Ccy { instrument_type = CCY } }
     | Error e -> Error e 
-
 
   let equity ~isin ~name ~lot_size ~unit_price ~issue_date = 
     let valid = validate_base ~isin ~name ~lot_size in
@@ -104,18 +127,23 @@ module Instrument : Instrument_sig = struct
 
   let fixed_income ~isin ~name ~lot_size ~issue_date ~maturity_date ~coupon_rate ~coupon_frequency = 
     let valid = validate_base ~isin ~name ~lot_size in
-    match valid with
-    | Ok base -> Ok {
-        base = base;
-        custom = FixedIncome { 
-          instrument_type = FixedIncome; 
-          issue_date = issue_date; 
-          maturity_date = maturity_date;
-          coupon_rate = coupon_rate;
-          coupon_frequency = coupon_frequency;
-        }
-      }
-    | Error e -> Error e 
+      match valid with
+      | Ok base -> 
+        let validcustom = validate_fixed_income FixedIncome issue_date maturity_date coupon_rate coupon_frequency in
+        (match validcustom with
+        | Error e -> Error e
+        | Ok _ ->
+            Ok {
+                base = base;
+                custom = FixedIncome { 
+                  instrument_type = FixedIncome; 
+                  issue_date = issue_date; 
+                  maturity_date = maturity_date;
+                  coupon_rate = coupon_rate;
+                  coupon_frequency = coupon_frequency;
+                }
+              })
+      | Error e -> Error e
 
   let get_instrument_type instrument = 
     match instrument.custom with
