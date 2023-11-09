@@ -45,12 +45,12 @@ module TradingValidator = struct
 
   let date_order_check (dates: (Calendar.t * Calendar.t option)) =
     match dates with
-    | (d1, None) -> Some(d1)
+    | (d1, None) -> Some (d1, None)
     | (d1, Some d2) ->
-      if d1 <= d2 then Some(d1) else None
+      if d1 <= d2 then Some (d1, Some(d2)) else None
 
   let date_order :
-    (Calendar.t * Calendar.t option, Calendar.t, 'err) validator_builder =
+    (Calendar.t * Calendar.t option, Calendar.t * Calendar.t option, 'err) validator_builder =
       fun err dates -> 
         custom date_order_check err dates
 end

@@ -42,8 +42,11 @@ module Instrument : Instrument_sig = struct
   module FixedIncome = struct
     type t = {
       instrument_type: instrument_type;
+      issue_maturity_date: CalendarLib.Calendar.t * CalendarLib.Calendar.t option;
+      (*
       issue_date: CalendarLib.Calendar.t;
       maturity_date: CalendarLib.Calendar.t option;
+      *)
       coupon_rate: coupon_rate;
       coupon_frequency: coupon_frequency;
     }
@@ -85,20 +88,18 @@ module Instrument : Instrument_sig = struct
     let open Tvalidator in
     TradingValidator.date_order "Issue date must be before maturity date"
 
-  let build_fixed_income (instrument_type: instrument_type) (issue_date: CalendarLib.Calendar.t) (maturity_date: CalendarLib.Calendar.t option) (coupon_rate: coupon_rate) (coupon_frequency: coupon_frequency) = FixedIncome {
+  let build_fixed_income (instrument_type: instrument_type) (issue_maturity_date: CalendarLib.Calendar.t * CalendarLib.Calendar.t option) (coupon_rate: coupon_rate) (coupon_frequency: coupon_frequency) = FixedIncome {
     instrument_type; 
-    issue_date; 
-    maturity_date;
+    issue_maturity_date; 
     coupon_rate;
     coupon_frequency;
   }
 
-  let validate_fixed_income (instrument_type: instrument_type) (issue_date: CalendarLib.Calendar.t) (maturity_date: CalendarLib.Calendar.t option) (coupon_rate: coupon_rate) (coupon_frequency: coupon_frequency) =
+  let validate_fixed_income (instrument_type: instrument_type) (issue_maturity_date: CalendarLib.Calendar.t * CalendarLib.Calendar.t option) (coupon_rate: coupon_rate) (coupon_frequency: coupon_frequency) =
     let open Validator in
     let valid = build build_fixed_income
     |> keep instrument_type
-    |> keep issue_date
-    |> keep maturity_date
+    |> validate issue_maturity_date validate_issue_maturity_date 
     |> keep coupon_rate
     |> keep coupon_frequency in
     match valid with
@@ -125,24 +126,22 @@ module Instrument : Instrument_sig = struct
     | Error e -> Error e 
 
 
-  let fixed_income ~isin ~name ~lot_size ~issue_date ~maturity_date ~coupon_rate ~coupon_frequency = 
+  let fixed_income ~isin ~name ~lot_size ~issue_maturity_date ~coupon_rate ~coupon_frequency = 
     let valid = validate_base ~isin ~name ~lot_size in
       match valid with
       | Ok base -> 
-        let validcustom = validate_fixed_income FixedIncome issue_date maturity_date coupon_rate coupon_frequency in
+        let validcustom = validate_fixed_income FixedIncome issue_maturity_date coupon_rate coupon_frequency in
         (match validcustom with
         | Error e -> Error e
-        | Ok _ ->
-            Ok {
-                base = base;
-                custom = FixedIncome { 
-                  instrument_type = FixedIncome; 
-                  issue_date = issue_date; 
-                  maturity_date = maturity_date;
-                  coupon_rate = coupon_rate;
-                  coupon_frequency = coupon_frequency;
-                }
-              })
+        | Ok _ -> Ok {
+            base = base;
+            custom = FixedIncome { 
+              instrument_type = FixedIncome; 
+              issue_maturity_date = issue_maturity_date; 
+              coupon_rate = coupon_rate;
+              coupon_frequency = coupon_frequency;
+            }
+        })
       | Error e -> Error e
 
   let get_instrument_type instrument = 
@@ -163,17 +162,11 @@ module Instrument : Instrument_sig = struct
 
   let get_lot_size instrument = instrument.base.lot_size
 
-  let get_issue_date instrument = 
+  let get_issue_maturity_date instrument = 
     match instrument.custom with
     | Ccy _ -> None
-    | Equity equity -> Some equity.issue_date
-    | FixedIncome fixed_income -> Some fixed_income.issue_date
-
-  let get_maturity_date instrument = 
-    match instrument.custom with
-    | Ccy _ -> None
-    | Equity _ -> None
-    | FixedIncome fixed_income -> fixed_income.maturity_date
+    | Equity equity -> Some (equity.issue_date, None)
+    | FixedIncome fixed_income -> Some fixed_income.issue_maturity_date
 
   let get_coupon_rate instrument = 
     match instrument.custom with

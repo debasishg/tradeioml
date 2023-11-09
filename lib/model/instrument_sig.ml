@@ -20,7 +20,7 @@ module type Instrument_sig = sig
   val equity: isin: ISINCode.t -> name: Instrumentname.t -> lot_size: lot_size -> unit_price: unit_price -> issue_date: CalendarLib.Calendar.t -> (t, string) validator_result
 
   (* smart constructor for creating fixed income *)
-  val fixed_income: isin: ISINCode.t -> name: Instrumentname.t -> lot_size: lot_size -> issue_date: CalendarLib.Calendar.t -> maturity_date: CalendarLib.Calendar.t option -> coupon_rate: coupon_rate -> coupon_frequency: coupon_frequency -> (t, string) validator_result
+  val fixed_income: isin: ISINCode.t -> name: Instrumentname.t -> lot_size: lot_size -> issue_maturity_date: CalendarLib.Calendar.t * CalendarLib.Calendar.t option -> coupon_rate: coupon_rate -> coupon_frequency: coupon_frequency -> (t, string) validator_result
 
   val get_instrument_type : t -> instrument_type
 
@@ -32,9 +32,7 @@ module type Instrument_sig = sig
 
   val get_lot_size : t -> lot_size 
 
-  val get_issue_date : t -> CalendarLib.Calendar.t option
-
-  val get_maturity_date : t -> CalendarLib.Calendar.t option
+  val get_issue_maturity_date : t -> (CalendarLib.Calendar.t * CalendarLib.Calendar.t option) option
 
   val get_coupon_rate : t -> coupon_rate option
 
