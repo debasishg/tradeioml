@@ -29,3 +29,8 @@ type quantity = float
 (* unit price for the instrument *)
 type unit_price = float
 
+type tax_fee_id =
+  | TradeTax
+  | Commission
+  | VAT
+  | Surcharge
