@@ -53,4 +53,13 @@ module TradingValidator = struct
     (Calendar.t * Calendar.t option, Calendar.t * Calendar.t option, 'err) validator_builder =
       fun err dates -> 
         custom date_order_check err dates
+
+  let float_min_check (min : float) (value : float) =
+    if value < min then
+      None
+    else
+      Some value
+      
+      
+  let float_min min = custom (float_min_check min)
 end
