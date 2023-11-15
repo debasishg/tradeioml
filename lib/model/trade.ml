@@ -6,9 +6,10 @@ open CalendarLib
 open Market
 open Validator
 open List
+open Taxfee
 
-module Trade(T : Trade_sig) : Trade_sig with module TaxFeeForTrade = T.TaxFeeForTrade = struct
-  module TaxFeeForTrade = T.TaxFeeForTrade 
+module Trade(TaxFeeForMarket: TaxFee) : Trade_sig = struct
+  module TaxFeeForTrade = TaxFeeForMarket
 
   type money = float
 
@@ -31,6 +32,8 @@ module Trade(T : Trade_sig) : Trade_sig with module TaxFeeForTrade = T.TaxFeeFor
 
   let net_amount t: money = 
     principal t +. (List.fold_left (fun acc (_, v) -> acc +. v) 0. t.tax_fees)
+
+  let tax_fees t = t.tax_fees
 
   let value_as t tax_fee = 
     let tax_fee_rate = List.assoc tax_fee TaxFeeForTrade.tax_fee_rates in
