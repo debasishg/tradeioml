@@ -8,7 +8,7 @@ open Validator
 
 module type Trade_sig = sig
   module TaxFeeForTrade : TaxFee
-  type t
+  type t 
   type money
 
   (* create a validated trade *)
@@ -31,6 +31,7 @@ module type Trade_sig = sig
   (* get the net amount of the trade *)
   val net_amount: t -> money
 
+  (* get the tax/fee list along with values for the trade *)
   val tax_fees: t -> (TaxFeeForTrade.t * money) list
   
 end

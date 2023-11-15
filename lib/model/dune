@@ -1,3 +1,4 @@
 (library
  (name model)
+ (preprocess (pps ppx_fields_conv))
  (libraries base calendar unix str validator))

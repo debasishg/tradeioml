@@ -4,7 +4,6 @@ open Instrumentid
 open Common
 open CalendarLib
 open Market
-open Validator
 open List
 open Taxfee
 
@@ -24,9 +23,40 @@ module Trade(TaxFeeForMarket: TaxFee) : Trade_sig = struct
     value_date: Calendar.t option;
     tax_fees: (TaxFeeForTrade.t * money) list;
     net_amount: money option;
+  } [@@deriving fields ~getters]
+
+  let build_trade account_no isin market buy_sell unit_price quantity trade_date value_date = {
+    account_no;
+    isin;
+    market;
+    buy_sell;
+    unit_price;
+    quantity;
+    trade_date;
+    value_date;
+    tax_fees = [];
+    net_amount = None;
   }
 
-  let create_trade ~account_no ~isin ~market ~buy_sell ~unit_price ~quantity ~trade_date ~value_date = failwith "TODO"
+  let validate_trade ~account_no ~isin ~market ~buy_sell ~unit_price ~quantity ~trade_date ~value_date = 
+    let open Validator in 
+    let open Tvalidator in 
+    let valid = build build_trade 
+    |> keep account_no
+    |> keep isin
+    |> keep market
+    |> keep buy_sell
+    |> validate unit_price (TradingValidator.float_min 1.0 "Unit price must be > 0")
+    |> validate quantity (TradingValidator.float_min 1.0 "Quantity must be > 0")
+    |> keep trade_date
+    |> keep value_date in
+    match valid with
+    | Ok trade -> Ok trade
+    | Error e  -> Error e 
+
+
+  let create_trade ~account_no ~isin ~market ~buy_sell ~unit_price ~quantity ~trade_date ~value_date = 
+    validate_trade ~account_no ~isin ~market ~buy_sell ~unit_price ~quantity ~trade_date ~value_date
 
   let principal t = t.unit_price *. t.quantity
 
