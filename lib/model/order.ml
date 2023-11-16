@@ -3,8 +3,9 @@ open Instrumentid
 open Common
 open CalendarLib
 open Accountid
+open Order_sig
 
-module Order = struct
+module Order: Order_sig = struct
 
   type line_item = {
     order_no: Orderno.t;
@@ -12,14 +13,14 @@ module Order = struct
     quantity: quantity;
     unit_price: unit_price;
     buy_sell: buy_sell;
-  } 
+  } [@@deriving fields ~getters]
 
   type t = {
     no: Orderno.t;
     order_date: Calendar.t;
     account_no: Accountno.t;
     items: line_item list;
-  }
+  } [@@deriving fields ~getters]
 
   let build_line_item order_no isin quantity unit_price buy_sell = {
     order_no;

@@ -38,6 +38,12 @@ module Trade(TaxFeeForMarket: TaxFee) : Trade_sig = struct
     net_amount = None;
   }
 
+  (*
+  let validate_trade_value_date =
+    let open Tvalidator in
+    TradingValidator.date_order "Trade date must be before value date"
+  *)
+
   let validate_trade ~account_no ~isin ~market ~buy_sell ~unit_price ~quantity ~trade_date ~value_date = 
     let open Validator in 
     let open Tvalidator in 
