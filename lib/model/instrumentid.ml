@@ -15,6 +15,7 @@ module ISINCode : ID = struct
       (TradingValidator.string_is_isin "Invalid isin")
 
   let of_string x = validate x
+  let of_string_unsafe x = x
   let to_string x = x
   let ( = ) = String.equal
 end
@@ -28,6 +29,7 @@ module Instrumentname : ID = struct
     string_is_not_empty "Empty"
 
   let of_string x = validate x
+  let of_string_unsafe x = x
   let to_string x = x
   let ( = ) = String.equal
 end

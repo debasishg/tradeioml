@@ -1,19 +1,10 @@
 open Orderid
-open Instrumentid
-open Common
+open Order_sig
 open CalendarLib
 open Accountid
-open Order_sig
+open Lineitem
 
 module Order: Order_sig = struct
-
-  type line_item = {
-    order_no: Orderno.t;
-    isin: ISINCode.t;
-    quantity: quantity;
-    unit_price: unit_price;
-    buy_sell: buy_sell;
-  } [@@deriving fields ~getters]
 
   type t = {
     no: Orderno.t;
@@ -68,4 +59,8 @@ module Order: Order_sig = struct
   let create_order ~no ~order_date ~account_no ~items =
     validate_order ~no ~order_date ~account_no ~items
 
+  let order_no o = o.no
+  let line_items o = o.items
+  let account_no o = o.account_no
+  let isin li = li.isin
 end

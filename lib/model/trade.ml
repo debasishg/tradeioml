@@ -4,7 +4,6 @@ open Instrumentid
 open Common
 open CalendarLib
 open Market
-open List
 open Taxfee
 
 module Trade(TaxFeeForMarket: TaxFee) : Trade_sig = struct

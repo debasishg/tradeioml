@@ -4,10 +4,11 @@ open Accountid
 open Common
 open Validator
 open CalendarLib
+open Lineitem
 
 module type Order_sig = sig
+
   (* abstract types *)
-  type line_item
   type t
 
   val create_line_item: 
@@ -24,5 +25,13 @@ module type Order_sig = sig
     account_no: Accountno.t ->
     items: line_item list -> 
     (t, string) validator_result
+
+  val order_no: t -> Orderno.t
+
+  val line_items: t -> line_item list
+
+  val account_no: t -> Accountno.t
+
+  val isin: line_item -> ISINCode.t
 end
 
