@@ -60,6 +60,5 @@ module TradingValidator = struct
     else
       Some value
       
-      
   let float_min min = custom (float_min_check min)
 end

@@ -19,8 +19,8 @@ module type Trade_sig = sig
     -> buy_sell: buy_sell 
     -> unit_price: unit_price 
     -> quantity: quantity
-    -> trade_date: Calendar.t 
-    -> value_date: Calendar.t option -> (t, string) validator_result
+    -> trade_value_date: (Calendar.t * Calendar.t option) 
+    -> (t, string) validator_result
 
   (* decorate a trade with tax/fees and net amount *)
   val with_tax_fees: t -> t
