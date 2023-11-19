@@ -1,2 +1,3 @@
 (library
- (name repository))
+ (name repository)
+ (libraries petrol))
