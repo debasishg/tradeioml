@@ -17,3 +17,11 @@ let accounts, Expr.[no; name; account_type; date_of_open; date_of_close; base_cu
         field "trading_currency" ~ty:Type.text;
         field "settlement_currency" ~ty:Type.text;
     ]
+
+let collect_all db =
+    Query.select Expr.[no; name] ~from:accounts
+    |> Request.make_many
+    |> Petrol.collect_list db
+    |> Lwt_result.map (List.map (fun (id, (text, ())) ->
+        (id,text)
+    ))

@@ -1,11 +1,12 @@
 open Common
+open Accountid
 open Validator
 
 module type Account_sig = sig
   (* abstract types *)
   type t
-  type account_no
-  type account_name
+  type account_no = Accountno.t
+  type account_name = Accountname.t
   
   (* smart constructor to create a validated trading account *)
   val create_trading_account: 

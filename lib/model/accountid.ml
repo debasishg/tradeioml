@@ -15,7 +15,7 @@ module Accountno : ID = struct
       (string_has_min_length 3 "Too short")
 
   let of_string x = validate x
-  let of_string_unsafe x = x
+  let of_string_unsafe x: string = x
   let to_string x = x
   let ( = ) = String.equal
 
